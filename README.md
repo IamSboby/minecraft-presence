@@ -8,6 +8,8 @@ A local Windows app that detects Minecraft Java and Bedrock and publishes a gene
 
 The frontend was created with AI using OpenAI Codex, under the project owner's direction. This includes the interface layout, styling and frontend code in `ui/index.html`, `ui/style.css` and `ui/app.js`.
 
+This README was also written with AI using OpenAI Codex, under the project owner's direction.
+
 See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) for completed tests and remaining checks.
 
 ## Install and use
