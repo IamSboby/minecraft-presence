@@ -1,0 +1,36 @@
+{
+  "name": "minecraft-private-presence",
+  "version": "0.2.0-alpha.3",
+  "private": true,
+  "description": "Local Minecraft activity detector and private Steam status bridge",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node scripts/start.js",
+    "start:headless": "node src/main.js",
+    "test": "node --test test/core.test.js test/registry.test.js test/steam.test.js test/credentials.test.js",
+    "check": "node --check src/main.js",
+    "pack:source": "node scripts/package.js",
+    "start:desktop": "electron .",
+    "build:windows": "node scripts/build-windows.js && node scripts/build-sensor.js && node scripts/build-runtime.js && electron-builder --win --x64 --publish never"
+  },
+  "dependencies": {
+    "adm-zip": "0.6.1",
+    "qrcode": "^1.5.4",
+    "steam-session": "^1.0.0",
+    "steam-user": "^5.0.0"
+  },
+  "overrides": {
+    "adm-zip": "0.6.1",
+    "protobufjs": "7.6.6"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3"
+  },
+  "main": "desktop/main.js",
+  "author": "Minecraft Presence contributors"
+}

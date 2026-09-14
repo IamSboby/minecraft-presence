@@ -1,0 +1,21 @@
+node_modules/
+.local/
+dist/
+*.log
+*.token
+config.json
+instances.json
+sensor.properties
+.build/
+sensor/dist/
+native/dist/
+runtime/
+release/
+*.bin
+panel.url
+pid.txt
+*.dmp
+*.bak
+# Superseded development launchers; Start.cmd is the supported source launcher.
+/Iniciar.cmd
+/iniciar.sh
