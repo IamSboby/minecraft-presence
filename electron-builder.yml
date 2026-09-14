@@ -1,0 +1,39 @@
+appId: org.minecraftpresence.desktop
+productName: Minecraft Presence
+directories:
+  output: release
+files:
+  - desktop/main.js
+  - src/**
+  - ui/**
+  - package.json
+  - LICENSE
+  - README.md
+  - RUNTIME-SOURCE.md
+extraResources:
+  - from: native/dist
+    to: native/dist
+  - from: sensor/dist
+    to: sensor/dist
+  - from: runtime
+    to: runtime
+asar: true
+npmRebuild: false
+electronDist: node_modules/electron/dist
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  signAndEditExecutable: false
+  artifactName: Minecraft-Presence-Setup-${version}.${ext}
+nsis:
+  oneClick: true
+  perMachine: false
+  allowElevation: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  deleteAppDataOnUninstall: true
+  installerLanguages: [en_US]
+  language: 1033
+  include: desktop/installer.nsh
+publish: null
