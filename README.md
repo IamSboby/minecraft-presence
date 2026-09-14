@@ -2,7 +2,13 @@
 
 A local Windows app that detects Minecraft Java and Bedrock and publishes a generic non-Steam game title to Steam. World names, server names and IP addresses are never sent.
 
-**Preview release.** Steam login and basic activity were confirmed by the tester. Real Java sensor states, installation, saved-login recovery and startup still need end-to-end confirmation. Bedrock detailed states are currently manual.
+**Preview release.** Steam login, basic activity, Windows installation and reopening the app have been verified. Real Java sensor states, saved-login recovery and startup after a Windows reboot still need end-to-end confirmation. Bedrock detailed states are currently manual.
+
+## AI disclosure
+
+The frontend was created with AI using OpenAI Codex, under the project owner's direction. This includes the interface layout, styling and frontend code in `ui/index.html`, `ui/style.css` and `ui/app.js`.
+
+See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) for completed tests and remaining checks.
 
 ## Install and use
 
