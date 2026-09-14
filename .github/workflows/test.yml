@@ -1,0 +1,25 @@
+name: Test
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: node scripts/build-windows.js
+      - run: node scripts/build-sensor.js
+      - run: node scripts/integration.js
+      - run: node node_modules/electron/install.js
+      - run: node scripts/build-runtime.js
+      - run: npx electron-builder --win --x64 --publish never
