@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';import path from 'node:path';import {execFileSync} from 'node:child_process';import {fileURLToPath} from 'node:url';import AdmZip from 'adm-zip';
+const root=path.dirname(path.dirname(fileURLToPath(import.meta.url)));process.chdir(root);
+const bin=name=>process.env.JAVA_HOME?path.join(process.env.JAVA_HOME,'bin',name+(process.platform==='win32'?'.exe':'')):name;
+await fs.mkdir('.build/classes',{recursive:true});await fs.mkdir('sensor/dist',{recursive:true});
+const compatibility=process.env.MCPRESENCE_SOURCE_COMPAT==='1'?['-source','17','-target','17']:['--release','17'];
+execFileSync(bin('javac'),[...compatibility,'-d','.build/classes','sensor/src/presence/Agent.java'],{stdio:'inherit',windowsHide:true});
+execFileSync(bin('javac'),[...compatibility,'--add-modules','jdk.attach','-d','.build/classes','sensor/src/presence/Attach.java'],{stdio:'inherit',windowsHide:true});
+execFileSync(bin('javac'),[...compatibility,'-d','.build/test','sensor/src/presence/Agent.java','sensor/test/presence/AgentTest.java'],{stdio:'inherit',windowsHide:true});
+execFileSync(bin('java'),['-cp',path.join(root,'.build/test'),'presence.AgentTest'],{stdio:'inherit',windowsHide:true});
+const zip=new AdmZip();zip.addFile('META-INF/MANIFEST.MF',Buffer.from((await fs.readFile('sensor/MANIFEST.MF','utf8')).replace(/\r?\n/g,'\r\n')));zip.addLocalFolder(path.join(root,'.build/classes'));zip.writeZip(path.join(root,'sensor/dist/presence-sensor.jar'));
