@@ -14,11 +14,10 @@ See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) f
 
 ## Install and use
 
-1. Close the previous development panel with **Quit Minecraft Presence**.
-2. Run **Minecraft-Presence-Setup-0.2.0-alpha.3.exe**. It installs for your Windows user without an administrator account.
-3. Open **Minecraft Presence** from the desktop or Start menu.
-4. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
-5. Launch Minecraft normally from your launcher. Java sensors load automatically.
+1. Run **Minecraft-Presence-Setup-0.2.0-alpha.3.exe**. It installs for your Windows user without an administrator account.
+2. Open **Minecraft Presence** from the desktop or Start menu.
+3. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
+4. Launch Minecraft normally from your launcher. Java sensors load automatically.
 
 The app includes Node/Electron and a minimal Java Attach runtime. No separate Node.js or Java setup is needed for supported Java games (Java 17+). Windows 10/11 x64 is the only packaged target.
 
