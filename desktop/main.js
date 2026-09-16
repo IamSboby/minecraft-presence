@@ -3,17 +3,27 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { startHub } from '../src/main.js';
 import { Credentials } from '../src/credentials.js';
+import { createShortcutSetup, steamRunning, steamSessionRunning } from './shortcut-setup.js';
+import { cleanupLauncherShortcuts } from '../src/shortcuts.js';
 
 app.setName('Minecraft Presence');
 // A distinct, predictable directory is also removed by the Windows uninstaller.
 const dataDirectory = path.join(app.getPath('appData'), 'Minecraft Presence');
 fs.mkdirSync(dataDirectory, { recursive: true });
 app.setPath('userData', dataDirectory);
-if (!app.requestSingleInstanceLock()) app.quit();
+if (process.argv.includes('--uninstall-cleanup')) {
+  app.whenReady().then(async () => {
+    try { if (await steamSessionRunning()) throw new Error('Session running'); await cleanupLauncherShortcuts(path.join(dataDirectory, 'managed-shortcuts.json'), steamRunning); app.exit(0); }
+    catch { dialog.showErrorBox('Minecraft Presence uninstall', 'Close Minecraft and end the Minecraft Steam session from its tray icon. Exit Steam completely, then try uninstalling again.'); app.exit(1); }
+  });
+}
+else if (!app.requestSingleInstanceLock()) app.quit();
 else {
   let window, tray, hub, quitting = false;
+  const shortcutSetup = createShortcutSetup({ dialog, getWindow: () => window, dataDirectory,
+    sessionExecutable: path.join(app.isPackaged ? process.resourcesPath : app.getAppPath(), 'native', 'dist', 'SteamSession.exe') });
   const show = () => { if (window) { window.show(); if (window.isMinimized()) window.restore(); window.focus(); } };
-  app.on('second-instance', show);
+  app.on('second-instance', () => { show(); if (window) shortcutSetup.firstRun().catch(() => {}); });
   app.on('window-all-closed', () => {});
   app.on('before-quit', () => { quitting = true; hub?.shutdown(); });
   // Let entry-module evaluation finish before Electron emits ready.
@@ -23,6 +33,7 @@ else {
       dataDirectory: app.getPath('userData'),
       resourceRoot: app.isPackaged ? process.resourcesPath : undefined,
       credentials: new Credentials(path.join(app.getPath('userData'), 'steam-session.bin'), safeStorage),
+      addSteamShortcut: () => shortcutSetup.add(),
       setStartAtLogin: enabled => { if (app.isPackaged) app.setLoginItemSettings({ openAtLogin: enabled, name: 'Minecraft Presence', path: process.execPath, args: ['--background'] }); },
       onQuit: () => { if (!quitting) app.quit(); }
     });
@@ -46,6 +57,7 @@ else {
     tray.on('double-click', show);
     await window.loadURL(hub.url);
     if (!process.argv.includes('--background') || hub.steam.state === 'disconnected') show();
+    if (!process.argv.includes('--background')) await shortcutSetup.firstRun().catch(() => {});
   } catch {
     dialog.showErrorBox('Minecraft Presence', 'Could not start. Close the previous Minecraft Presence app or local panel, then try again.');
     app.quit();

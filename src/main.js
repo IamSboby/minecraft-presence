@@ -57,6 +57,11 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/status') return send(res, 200, { activity: activity.snapshot(), title: activity.snapshot().active ? publicTitle(activity.snapshot().mode, activity.snapshot().count) : null, steam: steam.state, steamError:steam.error, qr: steam.qr, config, desktop: !!options.credentials, instances: registry.items, sensors: Object.fromEntries(sensors.status), scanError });
     if (req.method !== 'POST') return send(res, 404, {});
     const data = await body(req);
+    if (url.pathname === '/api/steam-shortcut') {
+      if (!options.addSteamShortcut) return send(res, 400, { error: 'Open the Windows desktop app to add a Steam shortcut.' });
+      const result = await options.addSteamShortcut();
+      return send(res, result.error ? 400 : 200, result);
+    }
     if (url.pathname === '/api/telemetry') {
       if (Object.keys(data).some(k => !['pid', 'mode'].includes(k))) return send(res, 400, { error: 'Only pid and mode are accepted; never names or addresses.' });
       return send(res, activity.report(data) ? 200 : 422, {});
