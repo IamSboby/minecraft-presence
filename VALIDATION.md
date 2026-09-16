@@ -1,5 +1,13 @@
 # Validation record
 
+## Release 1.0.0 (2026-09-16)
+
+27 Node tests pass. Local testing detected a real retail Bedrock client (PID 10628, Xbox/GDK layout), with no scan error; after the process disappeared, activity cleared. The panel correctly reported that automatic detailed states were unavailable. This local detector test was not connected to Steam and does not verify Bedrock visibility to friends. Preview live testing, manual state transitions, full reboot/session restoration and a complete 1.0.0 uninstall cycle remain pending. Java detailed states still depend on supported mappings and Attach permissions. The installer is unsigned. The hour-count branch is separate and is not included in main.
+
+## Bedrock compatibility local testing (2026-09-16)
+
+27 Node tests pass, including retail/Preview identity, GDK/custom path formats, launcher/server exclusions, data-root selection, process closing/PID reuse and manual generic states. The updated native ProcessScanner compiles with read-only Windows package-family and executable-version metadata. The isolated test service runs on 38473 and reports no scan error. Only the Minecraft Launcher was open at initial observation; its processes are correctly excluded. Real Bedrock is being installed by the tester, so retail/Preview live detection, state selection and clearing on close are still pending. Automatic Bedrock detailed-state detection is not implemented.
+
 ## Alpha.5 launcher repair and uninstall cleanup
 
 Store launcher shortcuts use registered Windows AppsFolder activation instead of directly running GameLaunchHelper.exe. Setup repairs alpha.4 targets while preserving their app IDs. Managed shortcut ownership is recorded; uninstall removes app-created entries or restores pre-existing entries and requires Steam to be closed. Alpha.4 UUID backups are adopted only when their contents match a pre-add snapshot. Session data, setup records and internal backups are removed by the Windows uninstaller. Automated repair, migration and uninstall tests pass; a normal-user install/launch/uninstall cycle remains pending.

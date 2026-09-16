@@ -2,7 +2,7 @@
 
 A local Windows app that detects Minecraft Java and Bedrock and publishes a generic non-Steam game title to Steam. World names, server names and IP addresses are never sent.
 
-**Beta release.** Steam login, basic activity, Windows installation and reopening the app have been verified. Real Java sensor states, saved-login recovery and startup after a Windows reboot still need end-to-end confirmation. Bedrock detailed states are currently manual.
+**Release 1.0.0.** Steam login, basic activity, Windows installation and reopening the app have been verified. Real Java sensor states, saved-login recovery and startup after a Windows reboot still need end-to-end confirmation. Bedrock detailed states are currently manual.
 
 ## AI disclosure
 
@@ -12,14 +12,14 @@ This README was also written (90% bc codex is stupid) with AI using OpenAI Codex
 
 See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) for completed tests and remaining checks.
 
-## Presence only (0.2.0-beta.2)
+## Presence only (1.0.0)
 
 This version publishes dynamic Minecraft activity only. The experimental Steam playtime helper and optional library shortcut have been retired. Launch Minecraft normally. Existing managed playtime shortcuts are cleaned up during migration after Steam and the helper are closed. Saved sign-in and Minecraft installations are preserved.
 
 ## Install and use
 
 
-1. Run **Minecraft-Presence-Setup-0.2.0-beta.2.exe**. It installs for your Windows user without an administrator account.
+1. Run **Minecraft-Presence-Setup-1.0.0.exe**. It installs for your Windows user without an administrator account.
 2. Open **Minecraft Presence** from the desktop or Start menu.
 3. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
 4. Launch Minecraft normally from your launcher. Java sensors load automatically.
@@ -30,7 +30,7 @@ Closing the window keeps detection running in the system tray. Double-click the 
 
 The desktop app encrypts its own Steam refresh token using Windows DPAPI. It does not read or reuse the desktop Steam client's credentials. Normal restarts restore the saved session; Steam can still revoke or expire authorization. **Sign out & forget session** deletes the local saved login. Uninstall through Windows Settings to remove the app, startup entry and its data. Upgrades preserve data.
 
-This beta installer is not code signed. Do not treat it as a stable public release yet.
+The Windows installer is not code signed. See VALIDATION.md for checks completed and remaining validation limits.
 
 ## Activity and instances
 
@@ -49,7 +49,15 @@ Steam receives a dynamic non-Steam game name, not official Steamworks rich prese
 
 ## Java troubleshooting
 
-### Launcher compatibility (main development branch)
+### Bedrock compatibility
+
+Release 1.0.0 recognizes Windows Bedrock retail and Preview clients using the client executable, known installation layouts and Windows package-family metadata. Both WindowsApps installations and Xbox/GDK/custom `Minecraft.Windows.exe` installations are covered. Launcher/helper and dedicated-server processes are excluded. The local panel shows the detected channel and executable version when Windows exposes it, and remembers existing retail/Preview data folders without reading world names.
+
+This improves game detection, not automatic Bedrock menu/world/server states. No native state sensor is implemented; unsupported automatic detail stays at Playing, with manual generic state selection available. Package layout alone cannot prove a build is UWP or GDK. Live retail detection was confirmed in the local panel. Retail clearing on close was also confirmed locally. Preview detection and manual state transitions still need live confirmation.
+
+Run `npm run test:bedrock:local` for the isolated development panel on port 38473. Its authenticated link is stored in `.build/bedrock-local-test/panel.url`. It does not restore your installed app's Steam session. Quit the installed Presence app before connecting Steam here. Test detection, select each manual state, then close Bedrock while leaving the launcher open and verify activity clears. These changes are included in 1.0.0.
+
+### Launcher compatibility
 
 Detection follows the running Java game, independently of the launcher's name. Supported launch patterns include the official launcher, Prism Launcher (PrismMC), MultiMC/PolyMC, and standard Minecraft clients started by ATLauncher, CurseForge, Modrinth App, GDLauncher, HMCL and TLauncher. Fabric, Quilt, legacy LaunchWrapper/OptiFine, Forge and NeoForge client entry points are recognized. Forge/NeoForge server and data-generation targets are excluded. Merely opening a launcher does not publish game activity.
 
@@ -59,7 +67,7 @@ Java `@argfile` launches are supported for readable local absolute files, or rel
 
 Installed Prism, MultiMC, PolyMC and ATLauncher folders under `%APPDATA%` are checked automatically. For portable launchers or custom CurseForge/Modrinth/GDLauncher locations, add the launcher folder or its instance container in Advanced settings. Instance markers (`instance.cfg`, `mmc-pack.json`, `instance.json`, `minecraftinstance.json`, `manifest.json`) identify immediate child instances, with `.minecraft` or `minecraft` subfolders preferred. New instances are checked every ten seconds; supported running games with `--gameDir`, `-Duser.dir`, or the legacy applet directory are also remembered automatically wherever they are installed.
 
-Game detection and detailed state detection are separate. Java 8 clients can be detected, but the bundled state sensor requires Java 17+ and supported mappings/Attach permissions; otherwise activity stays at `Minecraft — Playing`. Bedrock detailed states remain manual. These launcher compatibility changes are included in the beta.2 installer.
+Game detection and detailed state detection are separate. Java 8 clients can be detected, but the bundled state sensor requires Java 17+ and supported mappings/Attach permissions; otherwise activity stays at `Minecraft — Playing`. Bedrock detailed states remain manual. These launcher compatibility changes are included in 1.0.0.
 
 Launch-format references: [MultiMC's game wrapper](https://github.com/MultiMC/Launcher/blob/develop/libraries/launcher/org/multimc/onesix/OneSixLauncher.java), [ATLauncher's launch configuration](https://wiki.atlauncher.com/pack-admin/xml/pack/), and [Forge's client launch configuration](https://github.com/MinecraftForge/MinecraftForge/blob/26.2/build.gradle).
 
@@ -96,6 +104,6 @@ The installer is written to `release/`. Run `npm run start:desktop` to develop, 
 
 ## Release status
 
-See VALIDATION.md. GitHub publication is pending live verification with the tester. CI targets Windows only and builds without publishing.
+See VALIDATION.md for coverage and remaining checks. Release 1.0.0 is published on GitHub Releases. CI targets Windows only and builds without publishing.
 
 Independent project, not affiliated with Mojang, Microsoft or Valve.

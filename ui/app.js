@@ -19,11 +19,12 @@ async function refresh() {
     $('qr').hidden = !s.qr; if (s.qr) $('qr').src = s.qr;
     $('login').disabled = ['waiting','connecting','connected','blocked'].includes(s.steam);
     if (!rootsLoaded) { $('roots').value = s.config.roots.join('\n'); $('autoSensor').checked=s.config.autoSensor; $('javaCommand').value=s.config.javaCommand; $('startAtLogin').checked=s.config.startAtLogin !== false; rootsLoaded = true; }
-    const sensorRows = s.activity.games.filter(g=>g.edition==='java').map(g=> {
+    const sensorRows = s.activity.games.map(g=> {
+      if(g.edition==='bedrock') { const li=document.createElement('li');li.textContent='Bedrock · PID '+g.pid+': '+(g.source==='manual' ? 'Manual activity selected. ' : '')+(s.sensors[g.pid] || 'Detected; detailed activity needs manual selection.');return li; }
       const li=document.createElement('li'); const text = g.source==='sensor' && g.mode !== 'unknown' ? 'Connected — receiving live activity.' : g.source==='sensor' ? 'Connected, but this Minecraft version is not recognized.' : s.sensors[g.pid] || (s.config.autoSensor ? 'Waiting to load the sensor…' : 'Automatic sensor is off.');
       li.textContent='Java · PID ' + g.pid + ': ' + text; return li;
     });
-    if (!sensorRows.length) { const li=document.createElement('li');li.textContent='Open a Java instance to check the sensor.';sensorRows.push(li); }
+    if (!sensorRows.length) { const li=document.createElement('li');li.textContent='Open Minecraft Java or Bedrock to check detection.';sensorRows.push(li); }
     $('sensorStatus').replaceChildren(...sensorRows);
     const instances=s.instances.map(i => { const li = document.createElement('li'); li.textContent = i.name; const small = document.createElement('small'); small.textContent = i.directory; li.append(small); return li; });
     if(!instances.length){const li=document.createElement('li');li.textContent='Launch Minecraft to discover your first instance.';instances.push(li);}
