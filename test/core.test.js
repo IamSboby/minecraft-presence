@@ -3,7 +3,7 @@ import { Activity, argumentsOf, gameDirectory, classifyProcess, publicTitle } fr
 const java=(pid=10)=>({pid,name:'javaw.exe',cmd:'javaw net.minecraft.client.main.Main --gameDir "D:\\Other games\\Fresh instance"',start:'A'});
 test('external quoted directories and named loaders',()=>{
  assert.equal(gameDirectory(argumentsOf(java().cmd)),'D:\\Other games\\Fresh instance');
- for(const loader of ['net.fabricmc.loader.impl.launch.knot.KnotClient','net.quiltmc.loader.impl.launch.knot.KnotClient','cpw.mods.bootstraplauncher.BootstrapLauncher','org.multimc.EntryPoint']) assert.equal(classifyProcess({...java(),cmd:loader}),'java');
+ for(const loader of ['net.fabricmc.loader.impl.launch.knot.KnotClient','net.quiltmc.loader.impl.launch.knot.KnotClient','cpw.mods.bootstraplauncher.BootstrapLauncher --launchTarget forgeclient','org.multimc.EntryPoint']) assert.equal(classifyProcess({...java(),cmd:loader}),'java');
  assert.equal(classifyProcess({...java(),cmd:'java -jar unrelated.jar --gameDir D:\\foo'}),null);
  assert.equal(classifyProcess({...java(),cmd:'cpw.mods.modlauncher.Launcher --launchTarget forgeserver'}),null);
 });
@@ -22,4 +22,26 @@ test('heartbeat expiry, closed process, PID reuse, and multiple instances',()=>{
 });
 test('only fixed generic strings can reach Steam',()=>{
  assert.equal(publicTitle('singleplayer'),'Minecraft — Singleplayer');assert.equal(publicTitle('secret.example:25565'),'Minecraft — Playing');assert.equal(publicTitle('menu',2),'Minecraft — Multiple games');
+});
+
+test('launcher-independent clients and modern Forge targets; exclude launchers and servers',()=>{
+ for(const cmd of [
+  'org.prismlauncher.EntryPoint', 'org.multimc.onesix.OneSixLauncher',
+  'net.fabricmc.loader.launch.knot.KnotClient', 'net.minecraft.client.Minecraft',
+  'org.tlauncher.Launch1_8_9 --gameDir D:\\Games',
+  'net.minecraftforge.bootstrap.ForgeBootstrap --launchTarget forge_client',
+  'cpw.mods.bootstraplauncher.BootstrapLauncher --launchTarget=neoforgeclient',
+  'cpw.mods.modlauncher.Launcher --launchTarget fmlclient'
+ ]) assert.equal(classifyProcess({...java(),cmd}),'java',cmd);
+ for(const cmd of [
+  'org.tlauncher.tlauncher.rmo.TLauncher --gameDir D:\\Games',
+  '-cp D:\\net.minecraft.client.main.Main.jar com.example.Launcher',
+  'org.jackhuang.hmcl.Launcher',
+  'cpw.mods.bootstraplauncher.BootstrapLauncher --launchTarget=neoforge_server',
+  'net.minecraftforge.bootstrap.ForgeBootstrap --launchTarget forge_data',
+  'net.minecraft.launchwrapper.Launch --tweakClass cpw.mods.fml.common.launcher.FMLServerTweaker',
+  'cpw.mods.modlauncher.Launcher'
+ ]) assert.equal(classifyProcess({...java(),cmd}),null,cmd);
+ assert.equal(classifyProcess({...java(),cmd:'ignored',argv:['net.minecraft.client.main.Main']}),'java');
+ assert.equal(gameDirectory(['-Dminecraft.applet.TargetDirectory=D:\\Legacy']),'D:\\Legacy');
 });
