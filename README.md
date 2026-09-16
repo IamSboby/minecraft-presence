@@ -12,14 +12,14 @@ This README was also written (90% bc codex is stupid) with AI using OpenAI Codex
 
 See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) for completed tests and remaining checks.
 
-## Presence only (0.2.0-beta.1)
+## Presence only (0.2.0-beta.2)
 
 This version publishes dynamic Minecraft activity only. The experimental Steam playtime helper and optional library shortcut have been retired. Launch Minecraft normally. Existing managed playtime shortcuts are cleaned up during migration after Steam and the helper are closed. Saved sign-in and Minecraft installations are preserved.
 
 ## Install and use
 
 
-1. Run **Minecraft-Presence-Setup-0.2.0-beta.1.exe**. It installs for your Windows user without an administrator account.
+1. Run **Minecraft-Presence-Setup-0.2.0-beta.2.exe**. It installs for your Windows user without an administrator account.
 2. Open **Minecraft Presence** from the desktop or Start menu.
 3. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
 4. Launch Minecraft normally from your launcher. Java sensors load automatically.
@@ -59,7 +59,7 @@ Java `@argfile` launches are supported for readable local absolute files, or rel
 
 Installed Prism, MultiMC, PolyMC and ATLauncher folders under `%APPDATA%` are checked automatically. For portable launchers or custom CurseForge/Modrinth/GDLauncher locations, add the launcher folder or its instance container in Advanced settings. Instance markers (`instance.cfg`, `mmc-pack.json`, `instance.json`, `minecraftinstance.json`, `manifest.json`) identify immediate child instances, with `.minecraft` or `minecraft` subfolders preferred. New instances are checked every ten seconds; supported running games with `--gameDir`, `-Duser.dir`, or the legacy applet directory are also remembered automatically wherever they are installed.
 
-Game detection and detailed state detection are separate. Java 8 clients can be detected, but the bundled state sensor requires Java 17+ and supported mappings/Attach permissions; otherwise activity stays at `Minecraft — Playing`. Bedrock detailed states remain manual. These development changes are not included in the already published beta.1 installer.
+Game detection and detailed state detection are separate. Java 8 clients can be detected, but the bundled state sensor requires Java 17+ and supported mappings/Attach permissions; otherwise activity stays at `Minecraft — Playing`. Bedrock detailed states remain manual. These launcher compatibility changes are included in the beta.2 installer.
 
 Launch-format references: [MultiMC's game wrapper](https://github.com/MultiMC/Launcher/blob/develop/libraries/launcher/org/multimc/onesix/OneSixLauncher.java), [ATLauncher's launch configuration](https://wiki.atlauncher.com/pack-admin/xml/pack/), and [Forge's client launch configuration](https://github.com/MinecraftForge/MinecraftForge/blob/26.2/build.gradle).
 
