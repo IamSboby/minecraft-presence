@@ -49,6 +49,20 @@ Steam receives a dynamic non-Steam game name, not official Steamworks rich prese
 
 ## Java troubleshooting
 
+### Launcher compatibility (main development branch)
+
+Detection follows the running Java game, independently of the launcher's name. Supported launch patterns include the official launcher, Prism Launcher (PrismMC), MultiMC/PolyMC, and standard Minecraft clients started by ATLauncher, CurseForge, Modrinth App, GDLauncher, HMCL and TLauncher. Fabric, Quilt, legacy LaunchWrapper/OptiFine, Forge and NeoForge client entry points are recognized. Forge/NeoForge server and data-generation targets are excluded. Merely opening a launcher does not publish game activity.
+
+This list describes supported argument formats, not live testing of every launcher/version. TLauncher's standard clients and version-specific `org.tlauncher.Launch…` wrappers are detected; other custom wrappers are not guaranteed. Forge and NeoForge are mod loaders, not separate launchers. Proprietary clients, renamed Java executables and unreadable process arguments may remain undetected.
+
+Java `@argfile` launches are supported for readable local absolute files, or relative files with an explicit absolute `-Duser.dir`. Reads are limited to eight files of 1 MiB each, without nested expansion; unknown working directories are not guessed. Argument contents are inspected locally and are not persisted.
+
+Installed Prism, MultiMC, PolyMC and ATLauncher folders under `%APPDATA%` are checked automatically. For portable launchers or custom CurseForge/Modrinth/GDLauncher locations, add the launcher folder or its instance container in Advanced settings. Instance markers (`instance.cfg`, `mmc-pack.json`, `instance.json`, `minecraftinstance.json`, `manifest.json`) identify immediate child instances, with `.minecraft` or `minecraft` subfolders preferred. New instances are checked every ten seconds; supported running games with `--gameDir`, `-Duser.dir`, or the legacy applet directory are also remembered automatically wherever they are installed.
+
+Game detection and detailed state detection are separate. Java 8 clients can be detected, but the bundled state sensor requires Java 17+ and supported mappings/Attach permissions; otherwise activity stays at `Minecraft — Playing`. Bedrock detailed states remain manual. These development changes are not included in the already published beta.1 installer.
+
+Launch-format references: [MultiMC's game wrapper](https://github.com/MultiMC/Launcher/blob/develop/libraries/launcher/org/multimc/onesix/OneSixLauncher.java), [ATLauncher's launch configuration](https://wiki.atlauncher.com/pack-admin/xml/pack/), and [Forge's client launch configuration](https://github.com/MinecraftForge/MinecraftForge/blob/26.2/build.gradle).
+
 The sensor uses the standard Java Attach API. It reads only whether a world exists and whether an integrated server exists. It does not transform classes or read world/server identifiers. It sends only `{pid, mode}` to the authenticated local service.
 
 If Windows denies access, open Minecraft Presence normally under the same Windows user as Minecraft. Do not run the game as administrator. Restricted development environments may prevent Attach even when process discovery works. Do not disable Windows security to resolve this.
