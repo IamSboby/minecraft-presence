@@ -16,7 +16,7 @@ export async function processes(resourceRoot) {
       const result=JSON.parse(stdout);if(result.inaccessible)throw new Error('Process metadata unavailable');return result.processes;
     } catch(e) {if(e.code!=='ENOENT')throw e;}
     // Filter in the OS: never return command lines of unrelated programs.
-    const script = "$ErrorActionPreference='Stop'; $sid=(Get-Process -Id $PID).SessionId; @(Get-CimInstance Win32_Process -Filter \"Name='java.exe' OR Name='javaw.exe' OR Name='Minecraft.Windows.exe' OR Name='Minecraft.exe'\" | Where-Object {$_.SessionId -eq $sid} | Select-Object @{n='pid';e={[int]$_.ProcessId}},@{n='name';e={$_.Name}},@{n='path';e={$_.ExecutablePath}},@{n='cmd';e={$_.CommandLine}},@{n='start';e={[string]$_.CreationDate}}) | ConvertTo-Json -Compress";
+    const script = "$ErrorActionPreference='Stop'; $sid=(Get-Process -Id $PID).SessionId; @(Get-CimInstance Win32_Process -Filter \"Name='java.exe' OR Name='javaw.exe' OR Name='Minecraft.Windows.exe' OR Name='Minecraft.exe' OR Name='MinecraftPreview.exe' OR Name='Minecraft.WindowsBeta.exe'\" | Where-Object {$_.SessionId -eq $sid} | Select-Object @{n='pid';e={[int]$_.ProcessId}},@{n='name';e={$_.Name}},@{n='path';e={$_.ExecutablePath}},@{n='cmd';e={$_.CommandLine}},@{n='start';e={[string]$_.CreationDate}}) | ConvertTo-Json -Compress";
     const { stdout } = await exec('powershell.exe', ['-NoProfile', '-NonInteractive', '-EncodedCommand', Buffer.from(script, 'utf16le').toString('base64')], { windowsHide: true, timeout: 12000, maxBuffer: 4 * 1024 * 1024 });
     return stdout.trim() ? [].concat(JSON.parse(stdout)) : [];
   }

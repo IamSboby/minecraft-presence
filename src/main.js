@@ -9,6 +9,7 @@ import { Registry, processes, defaultRoots, atomicJSON } from './system.js';
 import { SteamBridge } from './steam.js';
 import { Sensors } from './sensor.js';
 import { expandLaunchArguments } from './launch-arguments.js';
+import { bedrockSensorStatus, bedrockDataRoots } from './bedrock.js';
 
 const appRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export async function startHub(options = {}) {
@@ -29,7 +30,15 @@ async function tick() {
   try {
     const list = await expandLaunchArguments(await processes(options.resourceRoot)); const now = Date.now(); activity.scan(list, now); lastScan = now; scanError = null;
     for (const game of activity.games.values()) if (game.directory) await registry.add(game.directory, '', 'process');
-    if (now - lastDiscover > 10000) { await registry.discover([...new Set([...defaultRoots(), ...config.roots])]); lastDiscover = now; }
+    if (now - lastDiscover > 10000) {
+      await registry.discover([...new Set([...defaultRoots(), ...config.roots])]);
+      for (const game of activity.games.values()) if (game.edition === 'bedrock') {
+        for (const directory of bedrockDataRoots(game.bedrock.channel)) {
+          try { if ((await fs.stat(directory)).isDirectory()) await registry.add(directory, game.bedrock.channel === 'preview' ? 'Bedrock Preview' : 'Bedrock', 'bedrock'); } catch {}
+        }
+      }
+      lastDiscover = now;
+    }
     for (const [pid, mode] of manual) { if (!activity.games.has(pid)) manual.delete(pid); else activity.report({ pid, mode }, now, 'manual'); }
     steam.update(activity.snapshot());
     await sensors.update(activity.games, list, config);
@@ -55,7 +64,7 @@ const server = http.createServer(async (req, res) => {
   const supplied = req.headers.authorization?.replace(/^Bearer /, '') || '';
   if (!/^[0-9a-f]{64}$/.test(supplied) || !crypto.timingSafeEqual(Buffer.from(supplied), Buffer.from(token))) return send(res, 401, { error: 'authorization' });
   try {
-    if (req.method === 'GET' && url.pathname === '/api/status') return send(res, 200, { activity: activity.snapshot(), title: activity.snapshot().active ? publicTitle(activity.snapshot().mode, activity.snapshot().count) : null, steam: steam.state, steamError:steam.error, qr: steam.qr, config, desktop: !!options.credentials, instances: registry.items, sensors: Object.fromEntries(sensors.status), scanError });
+    if (req.method === 'GET' && url.pathname === '/api/status') return send(res, 200, { activity: activity.snapshot(), title: activity.snapshot().active ? publicTitle(activity.snapshot().mode, activity.snapshot().count) : null, steam: steam.state, steamError:steam.error, qr: steam.qr, config, desktop: !!options.credentials, instances: registry.items, sensors: { ...Object.fromEntries(sensors.status), ...Object.fromEntries([...activity.games.values()].filter(g => g.edition === 'bedrock').map(g => [g.pid, bedrockSensorStatus(g)])) }, scanError });
     if (req.method !== 'POST') return send(res, 404, {});
     const data = await body(req);
     if (url.pathname === '/api/telemetry') {

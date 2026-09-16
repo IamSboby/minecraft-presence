@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { bedrockIdentity } from './bedrock.js';
 
 export const MODES = Object.freeze(['menu', 'singleplayer', 'multiplayer', 'unknown']);
 export const LABELS = Object.freeze({ menu: 'In menu', singleplayer: 'Singleplayer', multiplayer: 'Multiplayer', unknown: 'Playing' });
@@ -25,7 +26,7 @@ export function gameDirectory(args) {
 }
 export function classifyProcess(p) {
   const name = p.name.toLowerCase().replace(/\.exe$/, '');
-  if (name === 'minecraft.windows' || (name === 'minecraft' && /minecraftuwp|minecraft for windows/i.test(p.path || ''))) return 'bedrock';
+  if (bedrockIdentity(p)) return 'bedrock';
   if (!/^javaw?$/.test(name)) return null;
   const args = p.argv || argumentsOf(p.cmd || '');
   const target = args.flatMap((a, i) => /^--launchTarget$/i.test(a) ? [args[i + 1] || ''] : /^--launchTarget=/i.test(a) ? [a.split('=').slice(1).join('=')] : []);
@@ -45,7 +46,7 @@ export class Activity {
   scan(processes, now = Date.now()) {
     this.games = new Map(processes.flatMap(p => {
       const edition = classifyProcess(p);
-      return edition ? [[p.pid, { pid: p.pid, edition, identity: p.start || '', directory: gameDirectory(p.argv || argumentsOf(p.cmd || '')) }]] : [];
+      return edition ? [[p.pid, { pid: p.pid, edition, identity: p.start || '', directory: edition === 'java' ? gameDirectory(p.argv || argumentsOf(p.cmd || '')) : null, ...(edition === 'bedrock' ? { bedrock: bedrockIdentity(p) } : {}) }]] : [];
     }));
     if (this.games.size) this.lastGame = now;
     for (const [pid, report] of this.reports) {
