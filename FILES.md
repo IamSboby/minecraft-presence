@@ -18,3 +18,6 @@ The initial history is split by responsibility. Use a file's history to find the
 Generated installers, Java runtimes, dependencies and private app data are excluded from Git. Installers belong in a future GitHub Release, after live validation. Runtime credentials and instance paths must never be committed.
 
 Automatic Windows startup and encrypted saved-session restoration are implemented. A successful installer/window test does not verify login restoration after a full Windows reboot. See VALIDATION.md for remaining checks, including the automatic Bedrock detail sensor, which is not implemented.
+# Optional launcher shortcut
+
+`desktop/shortcut-setup.js` handles first-run consent, launcher and Steam account selection, and Preferences setup. `src/shortcuts.js` preserves existing binary Steam shortcut entries and adds the launcher with a backup. `test/shortcuts.test.js` verifies preservation, duplicate handling and write guards.

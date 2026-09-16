@@ -1,4 +1,7 @@
-# Minecraft Presence for Windows
+# Minecraft Presence for Windows — hour-count
+
+This experimental branch preserves version 0.2.0-alpha.7 with the Steam session helper. The main branch is the presence-only beta. Counting time and publishing dynamic activity together is not supported by this experimental design. Launch the library shortcut from Steam; launcher waiting time may count. The helper waits up to ten minutes for a game and exits after the last game closes. Local Steam playtime still requires client verification.
+
 
 A local Windows app that detects Minecraft Java and Bedrock and publishes a generic non-Steam game title to Steam. World names, server names and IP addresses are never sent.
 
@@ -12,12 +15,21 @@ This README was also written (90% bc codex is stupid) with AI using OpenAI Codex
 
 See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) for completed tests and remaining checks.
 
+## Steam library sessions (alpha.7)
+
+When you select **Add to Steam**, the library shortcut starts a small Steam session helper and opens Minecraft Launcher. Start Minecraft from this library entry so Steam can follow the session. The helper detects Java and Bedrock independently of the persistent presence app and exits about 4–5 seconds after the last game closes. Its tray menu offers **End Steam session**. Before the first game, it waits up to ten minutes even if the launcher is not detectable. Use the tray menu to cancel this wait early.
+
+Steam may include the launcher waiting time. Native local playtime accumulation still needs confirmation in the Steam client; this is not a promise of public profile hours or Steamworks statistics. Uninstall requires Steam and the session helper to be closed, then removes managed shortcuts and app data. Minecraft installations and worlds are preserved.
+
 ## Install and use
 
-1. Run **Minecraft-Presence-Setup-0.2.0-alpha.3.exe**. It installs for your Windows user without an administrator account.
-2. Open **Minecraft Presence** from the desktop or Start menu.
-3. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
-4. Launch Minecraft normally from your launcher. Java sensors load automatically.
+In the next development build, the first interactive launch offers **Add Minecraft Launcher to Steam** or **Not now**. This is optional and can be started later from **Preferences**. Choose the installed launcher executable and close Steam when asked. The app adds a non-Steam library shortcut, preserves existing entries and backs up an existing shortcuts file. If the same launcher target already exists, it is not added again. This feature does not guarantee Steam playtime tracking. It is not included in the published 0.2.0-alpha.3 installer.
+
+1. Close the previous development panel with **Quit Minecraft Presence**.
+2. Run **Minecraft-Presence-Setup-0.2.0-alpha.7.exe**. It installs for your Windows user without an administrator account.
+3. Open **Minecraft Presence** from the desktop or Start menu.
+4. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
+5. Launch Minecraft normally from your launcher. Java sensors load automatically.
 
 The app includes Node/Electron and a minimal Java Attach runtime. No separate Node.js or Java setup is needed for supported Java games (Java 17+). Windows 10/11 x64 is the only packaged target.
 
