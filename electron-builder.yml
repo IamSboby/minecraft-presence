@@ -3,7 +3,7 @@ productName: Minecraft Presence
 directories:
   output: release
 files:
-  - desktop/main.js
+  - desktop/*.js
   - src/**
   - ui/**
   - package.json
@@ -13,6 +13,8 @@ files:
 extraResources:
   - from: native/dist
     to: native/dist
+    filter:
+      - ProcessScanner.exe
   - from: sensor/dist
     to: sensor/dist
   - from: runtime
