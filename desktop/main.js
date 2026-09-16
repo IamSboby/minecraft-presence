@@ -3,13 +3,38 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { startHub } from '../src/main.js';
 import { Credentials } from '../src/credentials.js';
+import { steamRunning, steamSessionRunning } from './shortcut-setup.js';
+import { cleanupLauncherShortcuts } from '../src/shortcuts.js';
 
 app.setName('Minecraft Presence');
 // A distinct, predictable directory is also removed by the Windows uninstaller.
 const dataDirectory = path.join(app.getPath('appData'), 'Minecraft Presence');
 fs.mkdirSync(dataDirectory, { recursive: true });
 app.setPath('userData', dataDirectory);
-if (!app.requestSingleInstanceLock()) app.quit();
+async function retireHoursShortcut() {
+  const ownershipFile = path.join(dataDirectory, 'managed-shortcuts.json');
+  if (!fs.existsSync(ownershipFile)) return;
+  while (true) {
+    try {
+      if (await steamSessionRunning() || await steamRunning()) throw new Error('Steam is open');
+      await cleanupLauncherShortcuts(ownershipFile, steamRunning);
+      for (const name of fs.readdirSync(dataDirectory)) {
+        if (['managed-shortcuts.json', 'steam-launcher.json', 'shortcut-setup.json'].includes(name) || /^shortcuts-[0-9a-f-]{36}\.bak$/i.test(name)) await fs.promises.rm(path.join(dataDirectory, name), { force: true });
+      }
+      return;
+    } catch {
+      const choice = await dialog.showMessageBox({ type: 'info', title: 'Switch to presence only', message: 'Close the Minecraft Steam session and exit Steam to remove the old playtime shortcut.', detail: 'Use End Steam session in the helper tray menu, then Steam → Exit. Your Minecraft installations, worlds and saved Steam sign-in are kept.', buttons: ['Retry cleanup', 'Do this later'], defaultId: 0, cancelId: 1 });
+      if (choice.response === 1) return;
+    }
+  }
+}
+if (process.argv.includes('--uninstall-cleanup')) {
+  app.whenReady().then(async () => {
+    try { if (await steamSessionRunning()) throw new Error('Session running'); await cleanupLauncherShortcuts(path.join(dataDirectory, 'managed-shortcuts.json'), steamRunning); app.exit(0); }
+    catch { dialog.showErrorBox('Minecraft Presence uninstall', 'Close Minecraft and end the Minecraft Steam session from its tray icon. Exit Steam completely, then try uninstalling again.'); app.exit(1); }
+  });
+}
+else if (!app.requestSingleInstanceLock()) app.quit();
 else {
   let window, tray, hub, quitting = false;
   const show = () => { if (window) { window.show(); if (window.isMinimized()) window.restore(); window.focus(); } };
@@ -19,6 +44,7 @@ else {
   // Let entry-module evaluation finish before Electron emits ready.
   app.whenReady().then(async () => {
   try {
+    await retireHoursShortcut();
     hub = await startHub({
       dataDirectory: app.getPath('userData'),
       resourceRoot: app.isPackaged ? process.resourcesPath : undefined,
