@@ -2,7 +2,7 @@
 
 A local Windows app that detects Minecraft Java and Bedrock and publishes a generic non-Steam game title to Steam. World names, server names and IP addresses are never sent.
 
-**Preview release.** Steam login, basic activity, Windows installation and reopening the app have been verified. Real Java sensor states, saved-login recovery and startup after a Windows reboot still need end-to-end confirmation. Bedrock detailed states are currently manual.
+**Beta release.** Steam login, basic activity, Windows installation and reopening the app have been verified. Real Java sensor states, saved-login recovery and startup after a Windows reboot still need end-to-end confirmation. Bedrock detailed states are currently manual.
 
 ## AI disclosure
 
@@ -12,9 +12,14 @@ This README was also written (90% bc codex is stupid) with AI using OpenAI Codex
 
 See [FILES.md](FILES.md) for the source map and [VALIDATION.md](VALIDATION.md) for completed tests and remaining checks.
 
+## Presence only (0.2.0-beta.1)
+
+This version publishes dynamic Minecraft activity only. The experimental Steam playtime helper and optional library shortcut have been retired. Launch Minecraft normally. Existing managed playtime shortcuts are cleaned up during migration after Steam and the helper are closed. Saved sign-in and Minecraft installations are preserved.
+
 ## Install and use
 
-1. Run **Minecraft-Presence-Setup-0.2.0-alpha.3.exe**. It installs for your Windows user without an administrator account.
+
+1. Run **Minecraft-Presence-Setup-0.2.0-beta.1.exe**. It installs for your Windows user without an administrator account.
 2. Open **Minecraft Presence** from the desktop or Start menu.
 3. Choose **Connect to Steam** and scan the QR code using Steam Guard on your phone.
 4. Launch Minecraft normally from your launcher. Java sensors load automatically.
@@ -25,7 +30,7 @@ Closing the window keeps detection running in the system tray. Double-click the 
 
 The desktop app encrypts its own Steam refresh token using Windows DPAPI. It does not read or reuse the desktop Steam client's credentials. Normal restarts restore the saved session; Steam can still revoke or expire authorization. **Sign out & forget session** deletes the local saved login. Uninstall through Windows Settings to remove the app, startup entry and its data. Upgrades preserve data.
 
-This preview installer is not code signed. Do not treat it as a stable public release yet.
+This beta installer is not code signed. Do not treat it as a stable public release yet.
 
 ## Activity and instances
 
