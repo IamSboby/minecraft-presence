@@ -15,6 +15,7 @@ async function refresh() {
     $('error').textContent = s.scanError || ''; $('steam').textContent = labels[s.steam] || s.steam;
     $('sessionHelp').textContent = s.desktop ? 'Scan with Steam Guard once. Windows encrypts your session so you stay connected after restarting. Signing out removes the saved session.' : 'Scan with Steam Guard. This development panel keeps your session only until it closes. The Windows app can remember it securely.';
     $('startupOption').hidden = !s.desktop;
+    $('shortcutOption').hidden = !s.desktop;
     $('steamHelp').textContent = s.steamError || (s.steam === 'blocked' ? 'Another game or helper is using Steam. Close it to resume activity here.' : 'Steam receives only the generic activity shown on the left.');
     $('qr').hidden = !s.qr; if (s.qr) $('qr').src = s.qr;
     $('login').disabled = ['waiting','connecting','connected','blocked'].includes(s.steam);
@@ -40,6 +41,13 @@ async function refresh() {
 }
 async function action(fn){try{await fn();if(!stopped)await refresh();}catch(e){$('error').textContent=e.message;}}
 $('login').onclick=()=>action(()=>api('login',{}));$('logout').onclick=()=>action(()=>api('logout',{}));
+$('addShortcut').onclick=()=>action(async()=>{
+  $('addShortcut').disabled=true;
+  $('shortcutResult').textContent='Follow the setup window to add Minecraft Launcher.';
+  try { const result=await api('steam-shortcut',{}); $('shortcutResult').textContent=result.message; }
+  catch(e) { $('shortcutResult').textContent=e.message; }
+  finally { $('addShortcut').disabled=false; }
+});
 $('settings').onsubmit=e=>{e.preventDefault();action(async()=>{await api('config',{roots:$('roots').value.split('\n').map(x=>x.trim()).filter(Boolean),autoSensor:$('autoSensor').checked,javaCommand:$('javaCommand').value.trim(),startAtLogin:$('startAtLogin').checked});$('saved').textContent='Saved';});};
 $('stop').onclick=()=>action(async()=>{await api('stop',{});stopped=true;$('title').textContent='Minecraft Presence is closed';clearInterval(timer);});
 refresh();const timer=setInterval(refresh,2000);
