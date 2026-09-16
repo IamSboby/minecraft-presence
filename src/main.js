@@ -8,6 +8,7 @@ import { Activity, publicTitle, MODES } from './core.js';
 import { Registry, processes, defaultRoots, atomicJSON } from './system.js';
 import { SteamBridge } from './steam.js';
 import { Sensors } from './sensor.js';
+import { expandLaunchArguments } from './launch-arguments.js';
 
 const appRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export async function startHub(options = {}) {
@@ -26,9 +27,9 @@ const origin = `http://127.0.0.1:${config.port}`;
 
 async function tick() {
   try {
-    const list = await processes(options.resourceRoot); const now = Date.now(); activity.scan(list, now); lastScan = now; scanError = null;
+    const list = await expandLaunchArguments(await processes(options.resourceRoot)); const now = Date.now(); activity.scan(list, now); lastScan = now; scanError = null;
     for (const game of activity.games.values()) if (game.directory) await registry.add(game.directory, '', 'process');
-    if (now - lastDiscover > 10000) { await registry.discover(config.roots); lastDiscover = now; }
+    if (now - lastDiscover > 10000) { await registry.discover([...new Set([...defaultRoots(), ...config.roots])]); lastDiscover = now; }
     for (const [pid, mode] of manual) { if (!activity.games.has(pid)) manual.delete(pid); else activity.report({ pid, mode }, now, 'manual'); }
     steam.update(activity.snapshot());
     await sensors.update(activity.games, list, config);

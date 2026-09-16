@@ -41,7 +41,10 @@ export async function processes(resourceRoot) {
 }
 export function defaultRoots() {
   const home = os.homedir();
-  if (process.platform === 'win32') return [path.join(process.env.APPDATA || path.join(home, 'AppData', 'Roaming'), '.minecraft')];
+  if (process.platform === 'win32') {
+    const roaming = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
+    return ['.minecraft', 'PrismLauncher', 'MultiMC', 'PolyMC', 'ATLauncher'].map(name => path.join(roaming, name));
+  }
   if (process.platform === 'darwin') return [path.join(home, 'Library', 'Application Support', 'minecraft')];
   return [path.join(home, '.minecraft')];
 }
@@ -65,6 +68,25 @@ export class Registry {
   }
   async discover(roots) {
     for (const root of roots) {
+      // Installed and portable launchers commonly keep instances one level below a container.
+      for (const container of [root, path.join(root, 'instances'), path.join(root, 'Instances')]) {
+        let children;
+        try { children = await fs.readdir(container, { withFileTypes: true }); }
+        catch (e) { if (['ENOENT', 'ENOTDIR', 'EACCES', 'EPERM'].includes(e.code)) continue; throw e; }
+        for (const child of children.slice(0, 500)) {
+          if (!child.isDirectory() || child.isSymbolicLink()) continue;
+          const instance = path.join(container, child.name);
+          let marker = false;
+          for (const name of ['instance.cfg', 'mmc-pack.json', 'instance.json', 'minecraftinstance.json', 'manifest.json']) {
+            try { marker ||= (await fs.stat(path.join(instance, name))).isFile(); } catch {}
+          }
+          if (!marker) continue;
+          for (const name of ['.minecraft', 'minecraft', '']) {
+            const directory = path.join(instance, name);
+            try { if ((await fs.stat(directory)).isDirectory()) { await this.add(directory, child.name, 'launcher'); break; } } catch {}
+          }
+        }
+      }
       for (const filename of ['launcher_profiles.json', 'launcher_profiles_microsoft_store.json']) {
         let data;
         try { data = JSON.parse(await fs.readFile(path.join(root, filename), 'utf8')); }

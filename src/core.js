@@ -20,15 +20,21 @@ export function gameDirectory(args) {
     if (args[i].toLowerCase() === '--gamedir') return args[i + 1] || null;
     if (/^--gameDir=/i.test(args[i])) return args[i].slice(10);
   }
-  return args.find(a => a.startsWith('-Duser.dir='))?.slice(11) || null;
+  return args.find(a => a.startsWith('-Duser.dir='))?.slice(11)
+    || args.find(a => a.startsWith('-Dminecraft.applet.TargetDirectory='))?.split('=').slice(1).join('=') || null;
 }
 export function classifyProcess(p) {
   const name = p.name.toLowerCase().replace(/\.exe$/, '');
   if (name === 'minecraft.windows' || (name === 'minecraft' && /minecraftuwp|minecraft for windows/i.test(p.path || ''))) return 'bedrock';
   if (!/^javaw?$/.test(name)) return null;
-  const cmd = p.cmd || '';
-  if (/net\.minecraft\.server\.|--launchTarget[=\s]+\S*server/i.test(cmd)) return null;
-  return /net\.minecraft\.client\.|net\.(fabricmc|quiltmc)\.[^\s]*KnotClient|cpw\.mods\.(modlauncher\.Launcher|bootstraplauncher\.BootstrapLauncher)|net\.minecraft\.launchwrapper\.Launch|org\.(multimc|prismlauncher)\.EntryPoint/i.test(cmd) ? 'java' : null;
+  const args = p.argv || argumentsOf(p.cmd || '');
+  const target = args.flatMap((a, i) => /^--launchTarget$/i.test(a) ? [args[i + 1] || ''] : /^--launchTarget=/i.test(a) ? [a.split('=').slice(1).join('=')] : []);
+  // Match entire class tokens, never names embedded in classpaths or launcher paths.
+  if (target.some(t => /server|data/i.test(t)) || args.some(a => /^net\.minecraft\.server\./.test(a) || /(?:ServerTweaker|ServerMain)$/.test(a))) return null;
+  const client = /^(?:net\.minecraft\.client\.(?:main\.Main|Minecraft)|net\.(?:fabricmc|quiltmc)\.loader\.(?:impl\.)?launch\.knot\.KnotClient|net\.minecraft\.launchwrapper\.Launch|org\.(?:multimc|prismlauncher)\.(?:EntryPoint|onesix\.OneSixLauncher)|org\.tlauncher\.Launch\d[\w.]*)$/;
+  if (args.some(a => client.test(a))) return 'java';
+  const bootstrap = /^(?:cpw\.mods\.(?:modlauncher\.Launcher|bootstraplauncher\.BootstrapLauncher)|net\.(?:minecraftforge|neoforged)\.bootstrap\.(?:ForgeBootstrap|Bootstrap))$/;
+  return args.some(a => bootstrap.test(a)) && target.some(t => /client/i.test(t)) ? 'java' : null;
 }
 export function publicTitle(mode, count = 1) {
   if (count > 1) return 'Minecraft — Multiple games';
