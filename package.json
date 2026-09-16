@@ -1,6 +1,6 @@
 {
   "name": "minecraft-private-presence",
-  "version": "0.2.0-beta.2",
+  "version": "1.0.0",
   "private": true,
   "description": "Local Minecraft activity detector and private Steam status bridge",
   "type": "module",
@@ -10,11 +10,12 @@
   "scripts": {
     "start": "node scripts/start.js",
     "start:headless": "node src/main.js",
-    "test": "node --test test/core.test.js test/registry.test.js test/steam.test.js test/credentials.test.js test/shortcuts.test.js",
+    "test": "node --test test/core.test.js test/registry.test.js test/steam.test.js test/credentials.test.js test/shortcuts.test.js test/bedrock.test.js",
     "check": "node --check src/main.js",
     "pack:source": "node scripts/package.js",
     "start:desktop": "electron .",
-    "build:windows": "node scripts/build-windows.js && node scripts/build-sensor.js && node scripts/build-runtime.js && electron-builder --win --x64 --publish never"
+    "build:windows": "node scripts/build-windows.js && node scripts/build-sensor.js && node scripts/build-runtime.js && electron-builder --win --x64 --publish never",
+    "test:bedrock:local": "node scripts/bedrock-local-test.js"
   },
   "dependencies": {
     "adm-zip": "0.6.1",
