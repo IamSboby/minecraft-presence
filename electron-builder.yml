@@ -3,7 +3,7 @@ productName: Minecraft Presence
 directories:
   output: release
 files:
-  - desktop/main.js
+  - desktop/*.js
   - src/**
   - ui/**
   - package.json

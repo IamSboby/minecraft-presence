@@ -1,6 +1,6 @@
 {
   "name": "minecraft-private-presence",
-  "version": "0.2.0-alpha.3",
+  "version": "0.2.0-alpha.7",
   "private": true,
   "description": "Local Minecraft activity detector and private Steam status bridge",
   "type": "module",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "start:headless": "node src/main.js",
-    "test": "node --test test/core.test.js test/registry.test.js test/steam.test.js test/credentials.test.js",
+    "test": "node --test test/core.test.js test/registry.test.js test/steam.test.js test/credentials.test.js test/shortcuts.test.js",
     "check": "node --check src/main.js",
     "pack:source": "node scripts/package.js",
     "start:desktop": "electron .",
