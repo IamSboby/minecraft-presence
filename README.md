@@ -1,7 +1,7 @@
 # Minecraft Presence for Windows
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Instagram](https://img.shields.io/badge/Instagram-%40sboby4all-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/sboby4all/)
+[![Instagram](https://img.shields.io/badge/Instagram-%40IamSboby-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/iamboby/)
 
 A local Windows app that detects Minecraft Java and Bedrock and publishes a generic non-Steam game title to Steam. World names, server names and IP addresses are never sent.
 
