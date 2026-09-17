@@ -1,5 +1,8 @@
 # Minecraft Presence for Windows
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Instagram](https://img.shields.io/badge/Instagram-%40sboby4all-E4405F?logo=instagram&logoColor=white)](https://www.instagram.com/sboby4all/)
+
 A local Windows app that detects Minecraft Java and Bedrock and publishes a generic non-Steam game title to Steam. World names, server names and IP addresses are never sent.
 
 **Release 1.0.0.** Steam login, basic activity, Windows installation and reopening the app have been verified. Real Java sensor states, saved-login recovery and startup after a Windows reboot still need end-to-end confirmation. Bedrock detailed states are currently manual.
